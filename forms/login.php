@@ -36,19 +36,25 @@ session_start();
               }elseif (empty($password)){
                   echo "Password required";
               }else{
-                  $query = "SELECT * FROM `user` WHERE username='$username' and password='".password_hash($password,
-                          PASSWORD_DEFAULT)."'";
+                  $query = "SELECT * FROM `user` WHERE Usename='$username'";
                   $result = mysqli_query($conn,$query);
 
-                  $row = mysqli_num_rows($result);
+                  $resultsCheck = mysqli_num_rows($result);
 
-                  if ($row==1){
+                  if ($resultsCheck<1){
 
-                      $_SESSION['username'] = $username;
-                      // Redirect user to index.php
-                      header("Location: ../home.php");
+                      echo  "User does not exist";
                   }else{
-                      echo "Incorrect username or password";
+                      if ($row = mysqli_fetch_assoc($result)){
+                          $hashCheck = password_verify($password,$row['password']);
+                          if ($hashCheck == false){
+                              echo "wrong username or password";
+                          }elseif ($hashCheck == true){
+                              $_SESSION['username'] =$row['Usename'];
+                              header("Location: ../home.php");
+                              exit();
+                          }
+                      }
                   }
 
 
